@@ -1,9 +1,20 @@
 import { ChevronDown } from 'lucide-react'
 
 const QUESTIONS = [
-    { q: 'What is ClashGen?', a: 'A free tool that turns text into a wall design you can rebuild in Clash of Clans.' },
-    { q: 'Can I copy the design straight into the game?', a: 'Not yet. Copy Link shares your design on ClashGen so anyone can open the same one.' },
-    { q: 'Will every design fit my Town Hall level?', a: 'The tool warns you when a design needs more walls than your Town Hall allows.' },
+    {
+        q: 'What is ClashGen?',
+        a: 'A free tool that turns text into a wall design you can rebuild in Clash of Clans.'
+    },
+
+    {
+        q: 'Can I copy the generated design straight into the game?',
+        a: 'Not yet. Open in Clash currently opens a real Clash layout template. Copy Link shares your generated design on ClashGen.'
+    },
+
+    {
+        q: 'Will every design fit my Town Hall level?',
+        a: 'The tool warns you when a design needs more walls than your Town Hall allows.'
+    },
 ]
 
 export default function Faq() {

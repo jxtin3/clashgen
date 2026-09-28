@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Check, Download, Link2, SlidersHorizontal, X } from 'lucide-react'
+import {
+    Check,
+    Download,
+    ExternalLink,
+    Link2,
+    SlidersHorizontal,
+    X,
+} from 'lucide-react'
 import Preview from './Preview'
 import EditPanel from './EditPanel'
 import { exportPng } from '../lib/exportPng'
 import { buildShareUrl } from '../lib/settings'
 import { copyText } from '../lib/copyText'
+import { getClashLayoutUrl } from '../lib/clashLayout'
+
 
 export default function Generator({ settings, update, walls, zoom, limit, level, editOpen, setEditOpen }) {
     const [saving, setSaving] = useState(false)
@@ -29,6 +38,17 @@ export default function Generator({ settings, update, walls, zoom, limit, level,
         const ok = await copyText(buildShareUrl(settings))
         setCopyState(ok ? 'ok' : 'fail')
         setTimeout(() => setCopyState('idle'), 2200)
+    }
+
+    const openInClash = () => {
+        const url = getClashLayoutUrl({
+            th: settings.th,
+            type: 'HV',
+        })
+
+        if (!url) return
+
+        window.location.href = url
     }
 
     const savePng = async () => {
@@ -94,16 +114,35 @@ export default function Generator({ settings, update, walls, zoom, limit, level,
                         ) : (
                             <Link2 size={18} strokeWidth={2} />
                         )}
-                        {copyState === 'ok' ? 'Copied!' : copyState === 'fail' ? 'Copy failed' : 'Copy Link'}
+
+                        {copyState === 'ok'
+                            ? 'Copied!'
+                            : copyState === 'fail'
+                                ? 'Copy failed'
+                                : 'Copy Link'}
                     </button>
+
+                    <button
+                        onClick={openInClash}
+                        disabled={!getClashLayoutUrl({ th: settings.th, type: 'HV' })}
+                        className="btn-secondary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold disabled:pointer-events-none disabled:opacity-50"
+                    >
+                        <ExternalLink size={18} strokeWidth={2} />
+                        Open in Clash
+                    </button>
+                </div>
+
+                <div className="mt-3">
                     <button
                         onClick={savePng}
                         disabled={!walls.length || saving}
-                        className="btn-secondary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold disabled:pointer-events-none disabled:opacity-50"
+                        className="btn-secondary flex h-12 w-full items-center justify-center gap-2 rounded-xl font-semibold disabled:pointer-events-none disabled:opacity-50"
                     >
-                        <Download size={18} strokeWidth={2} /> {saving ? 'Saving…' : 'Save PNG'}
+                        <Download size={18} strokeWidth={2} />
+                        {saving ? 'Saving…' : 'Save PNG'}
                     </button>
                 </div>
+
                 <span className="sr-only" role="status">
                     {copyState === 'ok' ? 'Link copied' : ''}
                 </span>
