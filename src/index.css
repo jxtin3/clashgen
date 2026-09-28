@@ -12,6 +12,7 @@
     --color-subtle: #8A867C;
     --color-accent: #3B5BDB;
     --color-accent-fg: #FFFFFF;
+    --color-danger: #C0392B;
 }
 
 .dark {
@@ -24,6 +25,7 @@
     --color-subtle: #737884;
     --color-accent: #7C93FF;
     --color-accent-fg: #0B0D12;
+    --color-danger: #F08A78;
 }
 
 html {
