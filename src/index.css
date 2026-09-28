@@ -2,7 +2,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Clash', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
     --color-page: #F6F4EF;
     --color-surface: #FCFBF8;
     --color-sunken: #EFECE5;
@@ -40,4 +40,90 @@ body {
     background: var(--color-page);
     color: var(--color-fg);
     -webkit-font-smoothing: antialiased;
+}
+
+/* coc fonts */
+@font-face {
+    font-family: 'Clash';
+    src: url('/fonts/Clash_Bold.otf/Clash_Bold.otf.ttf') format('truetype');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Clash';
+    src: url('/fonts/Clash_Regular.otf/Clash_Regular.otf.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+body {
+    letter-spacing: 0.01em;
+}
+
+/* Game-style buttons: chunky edge that presses down */
+.btn-primary,
+.btn-secondary {
+    transition: transform 90ms ease, box-shadow 90ms ease, filter 150ms ease;
+    margin-bottom: 4px;
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    color: var(--color-accent-fg);
+    box-shadow: 0 4px 0 color-mix(in srgb, var(--color-accent) 60%, black);
+}
+
+.btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-fg);
+    border: 1px solid var(--color-line);
+    box-shadow: 0 4px 0 var(--color-line);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    filter: brightness(1.06);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+    transform: translateY(3px);
+}
+
+.btn-primary:active {
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-accent) 60%, black);
+}
+
+.btn-secondary:active {
+    box-shadow: 0 1px 0 var(--color-line);
+}
+
+/* Soft fade-in when the page loads */
+@keyframes reveal {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.reveal {
+    animation: reveal 0.5s ease-out backwards;
+}
+
+/* Respect people who turn animations off */
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        animation: none;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        transition: none;
+    }
 }

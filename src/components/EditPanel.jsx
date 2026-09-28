@@ -1,9 +1,11 @@
+import { SCENES } from '../lib/scenes'
 import { ChevronDown } from 'lucide-react'
 import { FONTS } from '../lib/fonts'
 import { WALL_LIMITS } from '../lib/limits'
 
+
 const chip = (active) =>
-    `rounded-xl border transition ${active ? 'border-accent bg-accent/10' : 'border-line bg-surface hover:bg-sunken'
+    `rounded-xl border transition hover:-translate-y-px active:scale-[0.97] ${active ? 'border-accent bg-accent/10' : 'border-line bg-surface hover:bg-sunken'
     }`
 
 function Group({ label, children }) {
@@ -68,6 +70,21 @@ export default function EditPanel({ settings, update }) {
                     ))}
                 </div>
                 {font.note && <p className="mt-2 text-sm text-subtle">{font.note}</p>}
+            </Group>
+
+            <Group label="Background">
+                <div className="grid grid-cols-2 gap-2">
+                    {Object.values(SCENES).map((s) => (
+                        <button
+                            key={s.id}
+                            aria-pressed={settings.sceneId === s.id}
+                            onClick={() => update({ sceneId: s.id })}
+                            className={`${chip(settings.sceneId === s.id)} h-12 px-3 font-medium text-fg`}
+                        >
+                            {s.label}
+                        </button>
+                    ))}
+                </div>
             </Group>
         </div>
     )

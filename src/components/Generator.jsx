@@ -2,15 +2,20 @@ import { Download, Link2, SlidersHorizontal, X } from 'lucide-react'
 import Preview from './Preview'
 import EditPanel from './EditPanel'
 
-export default function Generator({ dark, settings, update, walls, limit, editOpen, setEditOpen }) {
+export default function Generator({ settings, update, walls, zoom, limit, level, editOpen, setEditOpen }) {
     const over = walls.length > limit
     const percent = Math.min(100, (walls.length / limit) * 100)
 
     return (
         <section className="mt-8 lg:grid lg:grid-cols-[1fr_360px] lg:items-start lg:gap-6">
             {/* LEFT: preview card */}
-            <div className="rounded-2xl border border-line bg-surface p-3 shadow-sm sm:p-4">
-                <Preview walls={walls} dark={dark} empty={!settings.text.trim()} />
+            <div className="reveal rounded-2xl border border-line bg-surface p-3 shadow-sm sm:p-4">
+                <Preview
+                    walls={walls}
+                    sceneId={settings.sceneId}
+                    level={level}
+                    empty={!settings.text.trim()}
+                />
 
                 <div className="mt-4 flex items-center justify-between text-sm">
                     <span className="font-medium text-fg">Walls</span>
@@ -26,15 +31,21 @@ export default function Generator({ dark, settings, update, walls, limit, editOp
                 </div>
                 {over && (
                     <p className="mt-2 text-sm text-danger">
-                        {walls.length - limit} walls over the limit for TH{settings.th}. Try shorter text, a thinner font or a higher Town Hall.
+                        {walls.length - limit} walls over the limit for TH{settings.th}. Try shorter text or a higher Town Hall.
+                    </p>
+                )}
+                {!over && zoom < 1 && walls.length > 0 && (
+                    <p className="mt-2 text-sm text-subtle">
+                        Text scaled to {Math.round(zoom * 100)}% to fit the wall limit.
+                        {zoom < 0.5 && ' It is very small, so try shorter text.'}
                     </p>
                 )}
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
-                    <button className="flex h-12 items-center justify-center gap-2 rounded-xl bg-accent font-semibold text-accent-fg transition hover:opacity-90">
+                    <button className="btn-primary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold">
                         <Link2 size={18} strokeWidth={2} /> Copy Link
                     </button>
-                    <button className="flex h-12 items-center justify-center gap-2 rounded-xl border border-line bg-surface font-semibold text-fg transition hover:bg-sunken">
+                    <button className="btn-secondary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold">
                         <Download size={18} strokeWidth={2} /> Save PNG
                     </button>
                 </div>
@@ -61,7 +72,7 @@ export default function Generator({ dark, settings, update, walls, limit, editOp
                     <button
                         onClick={() => setEditOpen(false)}
                         aria-label="Close editor"
-                        className="flex h-11 w-11 items-center justify-center rounded-xl text-muted transition hover:bg-sunken hover:text-fg lg:hidden"
+                        className="flex h-11 w-11 items-center justify-center rounded-xl text-muted transition hover:bg-sunken hover:text-fg active:scale-90 lg:hidden"
                     >
                         <X size={20} strokeWidth={1.75} />
                     </button>
@@ -74,7 +85,7 @@ export default function Generator({ dark, settings, update, walls, limit, editOp
                 <div className="border-t border-line p-4 lg:hidden">
                     <button
                         onClick={() => setEditOpen(false)}
-                        className="h-12 w-full rounded-xl bg-accent font-semibold text-accent-fg"
+                        className="btn-primary h-12 w-full rounded-xl font-semibold"
                     >
                         Done
                     </button>
@@ -85,7 +96,7 @@ export default function Generator({ dark, settings, update, walls, limit, editOp
             {!editOpen && (
                 <button
                     onClick={() => setEditOpen(true)}
-                    className="fixed bottom-5 right-5 z-20 flex h-14 items-center gap-2 rounded-full bg-fg px-6 font-semibold text-page shadow-lg lg:hidden"
+                    className="fixed bottom-5 right-5 z-20 flex h-14 items-center gap-2 rounded-full bg-fg px-6 font-semibold text-page shadow-lg transition active:scale-95 lg:hidden"
                 >
                     <SlidersHorizontal size={20} strokeWidth={2} /> Edit
                 </button>

@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react'
 import { textToWalls } from '../lib/textToWalls'
 
-export default function useWalls(text, font) {
-    const [walls, setWalls] = useState([])
+export default function useWalls(text, font, limit) {
+    const [result, setResult] = useState({ walls: [], zoom: 1 })
 
     useEffect(() => {
         let cancelled = false
         const timer = setTimeout(async () => {
-            const result = await textToWalls(text, font)
-            if (!cancelled) setWalls(result)
-        }, 120) // small delay so we don't redraw on every key press
+            const r = await textToWalls(text, font, limit)
+            if (!cancelled) setResult(r)
+        }, 120)
         return () => {
             cancelled = true
             clearTimeout(timer)
         }
-    }, [text, font])
+    }, [text, font, limit])
 
-    return walls
+    return result
 }

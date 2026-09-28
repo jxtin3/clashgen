@@ -10,7 +10,7 @@ export default function Header({ dark, onToggle }) {
                 <button
                     onClick={onToggle}
                     aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-                    className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface text-muted transition hover:text-fg"
+                    className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface text-muted transition hover:text-fg active:scale-90"
                 >
                     {dark ? <Sun size={20} strokeWidth={1.75} /> : <Moon size={20} strokeWidth={1.75} />}
                 </button>

@@ -20,3 +20,10 @@ export const WALL_LIMITS = {
     17: 325,
     18: 325,
 }
+
+// DRAFT: which wall picture (wall-1 ... wall-19) each Town Hall uses.
+// Only TH15 = level 16 is backed by your data. Please check the rest.
+export const WALL_LEVELS = {
+    2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12,
+    13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19,
+}

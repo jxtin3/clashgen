@@ -10,6 +10,8 @@ import '@fontsource/fredoka/600.css'
 import '@fontsource/orbitron/700.css'
 
 export const FONTS = [
+    { id: 'clash-bold', label: 'Clash Bold', family: 'Clash', weight: 700 },
+    { id: 'clash', label: 'Clash', family: 'Clash', weight: 400 },
     { id: 'anton', label: 'Anton', family: 'Anton', weight: 400 },
     { id: 'bebas', label: 'Bebas Neue', family: 'Bebas Neue', weight: 400 },
     { id: 'bungee', label: 'Bungee', family: 'Bungee', weight: 400 },
