@@ -4,12 +4,14 @@ const RATIO = 0.75                 // tile height / tile width in the game view
 const RES = 10                     // pixels per unit in the hidden text image
 const VIEW_W = 96                  // hidden image size, in units
 const VIEW_H = 72
-const FIT_W = 0.84 * 88            // text may use 84% of the village width
+const FIT_W = 0.84 * 88            // auto size: text uses 84% of the village width
 const MAX_H = 0.4 * 66             // and 40% of its height
-const SHARPNESS = 0.4              // how much of a tile the text must cover to become a wall
 const MIN_ZOOM = 0.3               // smallest the text may shrink to
 
-export async function textToWalls(text, font, limit) {
+// zoom: null = auto fit to the wall limit
+export const DEFAULT_TRANSFORM = { zoom: null, rotation: 0, sharpness: 50, x: 0, y: 0 }
+
+export async function textToWalls(text, font, limit, t = DEFAULT_TRANSFORM) {
     const clean = text.trim()
     if (!clean) return { walls: [], zoom: 1 }
 
@@ -41,7 +43,12 @@ export async function textToWalls(text, font, limit) {
     const data = ctx.getImageData(0, 0, w, h).data
 
     // 3. list every tile covered by the text
+    const threshold = 0.1 + (t.sharpness / 100) * 0.6   // higher sharpness = thinner letters
+    const rad = (t.rotation * Math.PI) / 180
+    const cos = Math.cos(rad)
+    const sin = Math.sin(rad)
     const offsets = [-1 / 3, 0, 1 / 3]
+
     const collect = (zoom) => {
         const list = []
         for (let j = BUILD_MARGIN; j < BOARD - BUILD_MARGIN; j++) {
@@ -51,19 +58,28 @@ export async function textToWalls(text, font, limit) {
                     for (const ox of offsets) {
                         const dx = i + 0.5 + ox - BOARD / 2
                         const dy = j + 0.5 + oy - BOARD / 2
-                        const px = Math.round(midX + ((dx - dy) / zoom) * RES)
-                        const py = Math.round(midY + (((dx + dy) * RATIO) / zoom) * RES)
+                        // where this tile is on the screen, moved by the offset
+                        const sx = dx - dy - t.x
+                        const sy = (dx + dy) * RATIO - t.y
+                        // turn and scale to find the matching spot in the text image
+                        const bx = (sx * cos + sy * sin) / zoom
+                        const by = (-sx * sin + sy * cos) / zoom
+                        const px = Math.round(midX + bx * RES)
+                        const py = Math.round(midY + by * RES)
                         if (px < 0 || py < 0 || px >= w || py >= h) continue
                         if (data[(py * w + px) * 4 + 3] > 128) hits++
                     }
                 }
-                if (hits / 9 >= SHARPNESS) list.push([i, j])
+                if (hits / 9 >= threshold) list.push([i, j])
             }
         }
         return list
     }
 
-    // 4. if there are too many walls, shrink the text until it fits
+    // the person chose a zoom: use it exactly
+    if (t.zoom != null) return { walls: collect(t.zoom), zoom: t.zoom }
+
+    // auto: shrink the text until it fits the wall limit
     let zoom = 1
     let walls = collect(1)
     if (walls.length > limit) {

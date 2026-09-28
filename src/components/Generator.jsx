@@ -1,13 +1,56 @@
-import { Download, Link2, SlidersHorizontal, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Check, Download, Link2, SlidersHorizontal, X } from 'lucide-react'
 import Preview from './Preview'
 import EditPanel from './EditPanel'
+import { exportPng } from '../lib/exportPng'
+import { buildShareUrl } from '../lib/settings'
+import { copyText } from '../lib/copyText'
 
 export default function Generator({ settings, update, walls, zoom, limit, level, editOpen, setEditOpen }) {
+    const [saving, setSaving] = useState(false)
+    const [copyState, setCopyState] = useState('idle') // idle | ok | fail
     const over = walls.length > limit
     const percent = Math.min(100, (walls.length / limit) * 100)
 
+    // Phone drawer: lock the page behind it, and let Esc close it
+    useEffect(() => {
+        if (!editOpen) return
+        const isPhone = window.matchMedia('(max-width: 1023px)').matches
+        const onKey = (e) => e.key === 'Escape' && setEditOpen(false)
+        window.addEventListener('keydown', onKey)
+        if (isPhone) document.body.style.overflow = 'hidden'
+        return () => {
+            window.removeEventListener('keydown', onKey)
+            document.body.style.overflow = ''
+        }
+    }, [editOpen, setEditOpen])
+
+    const copyLink = async () => {
+        const ok = await copyText(buildShareUrl(settings))
+        setCopyState(ok ? 'ok' : 'fail')
+        setTimeout(() => setCopyState('idle'), 2200)
+    }
+
+    const savePng = async () => {
+        if (!walls.length || saving) return
+        setSaving(true)
+        try {
+            await exportPng({
+                walls,
+                sceneId: settings.sceneId,
+                level,
+                name: settings.text,
+                th: settings.th,
+            })
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setSaving(false)
+        }
+    }
+
     return (
-        <section className="mt-8 lg:grid lg:grid-cols-[1fr_360px] lg:items-start lg:gap-6">
+        <section className="mt-8 lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-6">
             {/* LEFT: preview card */}
             <div className="reveal rounded-2xl border border-line bg-surface p-3 shadow-sm sm:p-4">
                 <Preview
@@ -31,10 +74,10 @@ export default function Generator({ settings, update, walls, zoom, limit, level,
                 </div>
                 {over && (
                     <p className="mt-2 text-sm text-danger">
-                        {walls.length - limit} walls over the limit for TH{settings.th}. Try shorter text or a higher Town Hall.
+                        {walls.length - limit} walls over the limit for TH{settings.th}. Try zooming out, shorter text or a higher Town Hall.
                     </p>
                 )}
-                {!over && zoom < 1 && walls.length > 0 && (
+                {!over && settings.zoom === null && zoom < 1 && walls.length > 0 && (
                     <p className="mt-2 text-sm text-subtle">
                         Text scaled to {Math.round(zoom * 100)}% to fit the wall limit.
                         {zoom < 0.5 && ' It is very small, so try shorter text.'}
@@ -42,13 +85,28 @@ export default function Generator({ settings, update, walls, zoom, limit, level,
                 )}
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
-                    <button className="btn-primary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold">
-                        <Link2 size={18} strokeWidth={2} /> Copy Link
+                    <button
+                        onClick={copyLink}
+                        className="btn-primary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold"
+                    >
+                        {copyState === 'ok' ? (
+                            <Check size={18} strokeWidth={2.5} />
+                        ) : (
+                            <Link2 size={18} strokeWidth={2} />
+                        )}
+                        {copyState === 'ok' ? 'Copied!' : copyState === 'fail' ? 'Copy failed' : 'Copy Link'}
                     </button>
-                    <button className="btn-secondary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold">
-                        <Download size={18} strokeWidth={2} /> Save PNG
+                    <button
+                        onClick={savePng}
+                        disabled={!walls.length || saving}
+                        className="btn-secondary flex h-12 items-center justify-center gap-2 rounded-xl font-semibold disabled:pointer-events-none disabled:opacity-50"
+                    >
+                        <Download size={18} strokeWidth={2} /> {saving ? 'Saving…' : 'Save PNG'}
                     </button>
                 </div>
+                <span className="sr-only" role="status">
+                    {copyState === 'ok' ? 'Link copied' : ''}
+                </span>
             </div>
 
             {/* Dim area behind the drawer (mobile). Tap to close. */}
@@ -56,36 +114,34 @@ export default function Generator({ settings, update, walls, zoom, limit, level,
                 <div className="fixed inset-0 z-30 bg-black/25 lg:hidden" onClick={() => setEditOpen(false)} />
             )}
 
-            {/* RIGHT: edit panel (drawer on mobile, normal card on desktop) */}
+            {/* RIGHT: edit panel (drawer on mobile, sticky card on desktop) */}
             <aside
-                className={`fixed inset-y-0 right-0 z-40 flex w-[88%] max-w-sm flex-col bg-surface shadow-2xl transition-transform duration-200
+                className={`fixed right-0 top-0 z-40 flex h-dvh w-[88%] max-w-sm flex-col bg-surface shadow-2xl transition-transform duration-200
         ${editOpen ? 'translate-x-0' : 'translate-x-full'}
-        lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border lg:border-line lg:shadow-sm`}
+        lg:sticky lg:right-auto lg:top-20 lg:z-auto lg:h-auto lg:max-h-[calc(100dvh-6rem)] lg:w-auto lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border lg:border-line lg:shadow-sm`}
             >
-                <div className="flex items-center justify-between border-b border-line p-4">
+                <div className="flex shrink-0 items-center justify-between px-4 pt-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-fg">Edit design</h2>
-                        <p className={`text-sm ${over ? 'font-medium text-danger' : 'text-subtle'}`}>
+                        <h2 className="text-base font-semibold text-fg">Edit design</h2>
+                        <p className={`text-xs ${over ? 'font-medium text-danger' : 'text-subtle'}`}>
                             {walls.length} / {limit} walls
                         </p>
                     </div>
                     <button
                         onClick={() => setEditOpen(false)}
                         aria-label="Close editor"
-                        className="flex h-11 w-11 items-center justify-center rounded-xl text-muted transition hover:bg-sunken hover:text-fg active:scale-90 lg:hidden"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl text-muted transition hover:bg-sunken hover:text-fg active:scale-90 lg:hidden"
                     >
                         <X size={20} strokeWidth={1.75} />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4">
-                    <EditPanel settings={settings} update={update} />
-                </div>
+                <EditPanel settings={settings} update={update} zoom={zoom} />
 
-                <div className="border-t border-line p-4 lg:hidden">
+                <div className="shrink-0 border-t border-line p-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden">
                     <button
                         onClick={() => setEditOpen(false)}
-                        className="btn-primary h-12 w-full rounded-xl font-semibold"
+                        className="btn-primary h-11 w-full rounded-xl text-sm font-semibold"
                     >
                         Done
                     </button>

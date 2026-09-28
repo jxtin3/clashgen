@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useDarkMode from './hooks/useDarkMode'
 import useWalls from './hooks/useWalls'
 import { FONTS } from './lib/fonts'
 import { WALL_LIMITS, WALL_LEVELS } from './lib/limits'
+import { loadInitialSettings, saveSettings, clearShareParams } from './lib/settings'
 import Header from './components/Header'
 import Intro from './components/Intro'
 import Generator from './components/Generator'
@@ -12,18 +13,21 @@ import Footer from './components/Footer'
 export default function App() {
   const [dark, toggleDark] = useDarkMode()
   const [editOpen, setEditOpen] = useState(false)
-  const [settings, setSettings] = useState({
-    text: 'CLASH',
-    fontId: 'clash-bold',
-    th: 15,
-    sceneId: 'classic',
-  })
+  const [settings, setSettings] = useState(loadInitialSettings)
+
+  useEffect(() => {
+    clearShareParams()
+  }, [])
+
+  useEffect(() => {
+    saveSettings(settings)
+  }, [settings])
 
   const update = (patch) => setSettings((s) => ({ ...s, ...patch }))
   const font = FONTS.find((f) => f.id === settings.fontId)
   const limit = WALL_LIMITS[settings.th]
   const level = WALL_LEVELS[settings.th]
-  const { walls, zoom } = useWalls(settings.text, font, limit)
+  const { walls, zoom } = useWalls(settings.text, font, limit, settings)
 
   return (
     <div className="min-h-screen bg-page font-sans text-fg">

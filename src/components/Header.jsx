@@ -4,8 +4,9 @@ export default function Header({ dark, onToggle }) {
     return (
         <header className="sticky top-0 z-20 border-b border-line bg-page/85 backdrop-blur">
             <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-                <a href="/" aria-label="ClashGen home">
-                    <img src="/logo.png" alt="ClashGen" className="h-9 w-auto" />
+                <a href="/" aria-label="ClashGen home" className="flex items-center gap-2">
+                    <img src="/logo.png" alt="" className="h-9 w-auto" />
+                    <span className="text-xl font-bold text-fg">ClashGen</span>
                 </a>
                 <button
                     onClick={onToggle}
