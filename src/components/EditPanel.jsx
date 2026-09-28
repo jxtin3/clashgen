@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import { FONTS } from '../lib/fonts'
 import { WALL_LIMITS } from '../lib/limits'
 
@@ -19,6 +20,27 @@ export default function EditPanel({ settings, update }) {
 
     return (
         <div className="space-y-6">
+            <Group label="Town Hall">
+                <div className="relative">
+                    <select
+                        value={settings.th}
+                        onChange={(e) => update({ th: Number(e.target.value) })}
+                        className="h-12 w-full appearance-none rounded-xl border border-transparent bg-sunken px-4 pr-11 text-base font-medium text-fg focus:border-accent focus:outline-none"
+                    >
+                        {Object.entries(WALL_LIMITS).map(([th, walls]) => (
+                            <option key={th} value={th}>
+                                TH{th} ({walls} walls)
+                            </option>
+                        ))}
+                    </select>
+                    <ChevronDown
+                        size={18}
+                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-subtle"
+                    />
+                </div>
+                <p className="mt-2 text-sm text-subtle">The number in brackets is the wall limit.</p>
+            </Group>
+
             <Group label="Text">
                 <input
                     type="text"
@@ -46,23 +68,6 @@ export default function EditPanel({ settings, update }) {
                     ))}
                 </div>
                 {font.note && <p className="mt-2 text-sm text-subtle">{font.note}</p>}
-            </Group>
-
-            <Group label="Town Hall">
-                <div className="grid grid-cols-4 gap-2">
-                    {Object.entries(WALL_LIMITS).map(([th, walls]) => (
-                        <button
-                            key={th}
-                            aria-pressed={settings.th === Number(th)}
-                            onClick={() => update({ th: Number(th) })}
-                            className={`${chip(settings.th === Number(th))} py-2 text-center`}
-                        >
-                            <span className="block text-sm font-semibold text-fg">TH{th}</span>
-                            <span className="block text-xs text-subtle">{walls}</span>
-                        </button>
-                    ))}
-                </div>
-                <p className="mt-2 text-sm text-subtle">The small number is the wall limit.</p>
             </Group>
         </div>
     )
