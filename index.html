@@ -3,29 +3,73 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ClashGen | Clash of Clans Name Base Generator</title>
-  <meta name="description"
-    content="Free Clash of Clans name base generator. Type a name, pick a font and Town Hall level, and preview your wall design." />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>ClashGen | Clash of Clans Name Base Generator</title>
+
+  <meta name="description"
+    content="Create custom Clash of Clans name bases with ClashGen. Enter your name, choose a font and Town Hall level, and preview your design instantly." />
+
+  <meta name="robots" content="index, follow" />
+
+  <link rel="canonical" href="https://clashgen.vercel.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ClashGen | Clash of Clans Name Base Generator" />
+  <meta property="og:description"
+    content="Create custom Clash of Clans name bases with ClashGen. Enter your name, choose a font and Town Hall level, and preview your design instantly." />
+  <meta property="og:url" content="https://clashgen.vercel.app/" />
+  <meta property="og:image" content="https://clashgen.vercel.app/og-image.png" />
+  <meta property="og:site_name" content="ClashGen" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ClashGen | Clash of Clans Name Base Generator" />
+  <meta name="twitter:description"
+    content="Create custom Clash of Clans name bases with ClashGen. Enter your name, choose a font and Town Hall level, and preview your design instantly." />
+  <meta name="twitter:image" content="https://clashgen.vercel.app/og-image.png" />
+
+  <!-- Favicons -->
   <link rel="icon" href="/favicon.ico?v=2" sizes="48x48" />
   <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Theme -->
   <meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)" />
 
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ClashGen",
+      "url": "https://clashgen.vercel.app/",
+      "description": "A free Clash of Clans name base generator.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web"
+    }
+  </script>
+
+  <!-- Set dark mode before the page paints -->
   <script>
-    // set dark mode before the page paints (avoids a white flash)
     try {
       var t = localStorage.getItem('theme');
-      if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches))
+
+      if (
+        t === 'dark' ||
+        (!t && matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
         document.documentElement.classList.add('dark');
+      }
     } catch (e) { }
   </script>
 </head>
 
-
 <body>
   <div id="root"></div>
+
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
